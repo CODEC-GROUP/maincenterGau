@@ -4,17 +4,17 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Subscription;
-use App\Models\Subscription_User;
+
+use App\Models\SubscriptionUser;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class Subscription_usersContronllers extends Controller
 {
     public function cancelSubscription($id)
     {
-        $plans = Subscription_User::findOrFail($id);
+        $plans = SubscriptionUser::findOrFail($id);
         $plans->delete();
 
         return redirect()->route('subscriptions.show')->with('success', 'Subscription cancel successfully.');
@@ -23,7 +23,7 @@ class Subscription_usersContronllers extends Controller
 
     public function show()
     {
-        $plans = Subscription_User::orderBy('id','desc')->get();
+        $plans = SubscriptionUser::orderBy('id','desc')->get();
         $subscriptions = Subscription::all();
         $users = User::all();
         return view('subscriptions.show', compact('plans','subscriptions','users'));
@@ -34,6 +34,18 @@ class Subscription_usersContronllers extends Controller
             'subscription_id'=>'required',
             'user_id'=>'required',
         ]);
+        $subscription = Subscription::findOrFail($request->subscription_id);
+
+        // Initialize the end date
+        $endDate = now();
+
+        if ($subscription->subscription_type == 'month') {
+            $endDate->addMonth();
+        } elseif ($subscription->subscription_type == 'day') {
+            $endDate->addDays(30); // For a one-month subscription in days
+        } elseif ($subscription->subscription_type == 'year') {
+            $endDate->addYear();
+        }
 
         if ($validator->fails()) {
             return redirect()
@@ -41,9 +53,10 @@ class Subscription_usersContronllers extends Controller
                 ->withErrors($validator)
                 ->withInput();
         }else{
-            Subscription_User::create([
+            SubscriptionUser::create([
                 'subscription_id'=>$request->subscription_id,
                 'user_id'=>$request->user_id,
+                'end_date'=>$endDate,
             ]);
 
             return redirect()->route('subscriptions.show')->with('success','Subscription successfully.');
@@ -52,7 +65,7 @@ class Subscription_usersContronllers extends Controller
     }
     public function edit($id)
     {
-        $plans = Subscription_User::findOrFail($id);
+        $plans = SubscriptionUser::findOrFail($id);
         $subscriptions = Subscription::all();
         $users = User::all();
         return view('subscriptions.change', compact('plans','subscriptions','users'));
@@ -60,6 +73,18 @@ class Subscription_usersContronllers extends Controller
 
     public function update(Request $request, $id)
     {
+        $subscription = Subscription::findOrFail($request->subscription_id);
+
+
+        $endDate = now();
+
+        if ($subscription->subscription_type == 'month') {
+            $endDate->addMonth();
+        } elseif ($subscription->subscription_type == 'day') {
+            $endDate->addDays(30); // For a one-month subscription in days
+        } elseif ($subscription->subscription_type == 'year') {
+            $endDate->addYear();
+        }
         $validator = Validator::make($request->all(), [
             'subscription_id'=>'required',
             'user_id'=>'required',
@@ -70,10 +95,11 @@ class Subscription_usersContronllers extends Controller
                 ->withInput();
 
         } else {
-            $plans=Subscription_User::findOrFail($id);
+            $plans=SubscriptionUser::findOrFail($id);
             $plans->update([
                 'subscription_id'=>$request->subscription_id,
                 'user_id'=>$request->user_id,
+                'end_date'=>$endDate,
             ]);
 
             return redirect()->route('subscriptions.show')->with('success', 'Subscription change successfully.');

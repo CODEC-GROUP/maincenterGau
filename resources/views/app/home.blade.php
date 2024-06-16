@@ -33,6 +33,7 @@
                                     echo $dt->translatedFormat('l j F Y à H:i:s ');
                                 @endphp
                             </strong>
+                            <small>expire le </small><p class="fw-bold text-danger">{{$plan->end_date}}</p>
                             <a href="{{route('subscriptions.changeU',['id'=> $plan->id])}}" class="mx-2 btn btn-primary" style="text-decoration: none">
                                  change
                             </a>

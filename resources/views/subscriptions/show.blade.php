@@ -60,6 +60,7 @@
                 <th>ID</th>
                 <th>Users</th>
                 <th>Plans</th>
+                <th>Expiration</th>
                 <th>Actions</th>
             </tr>
             </thead>
@@ -80,6 +81,9 @@
                                 {{$subscription->name}}
                             @endif
                         @endforeach
+                    </td>
+                    <td class="text-danger">
+                        {{$plan->end_date}}
                     </td>
                     <td>
                         <a href="{{route('subscriptions.change',['id'=> $plan->id])}}" class="btn btn-warning">

@@ -38,8 +38,8 @@
                                 <div class="mb-3">
                                     <select class="form-select" aria-label="Default select example" name="subscription_type">
                                         <option value="">Choisir une option d abonnement</option>
-                                            <option value="30 Days">Mensuelle</option>
-                                            <option value="1 Years">Annuelle</option>
+                                            <option value="month">Mensuelle</option>
+                                            <option value="year">Annuelle</option>
                                     </select>
                                     @error('subscription_type')
                                     <div class="text-danger">{{ $message }}</div>
